@@ -1,0 +1,155 @@
+<html>
+   <head>
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/font-awesome.min.css">
+   </head>
+      <body>
+         <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <a class="navbar-brand" style="color:white;">Asset Manager</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor02" aria-controls="navbarColor02" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarColor02">
+               <ul class="navbar-nav mr-auto">
+                  <li class="nav-item active">
+                     <a class="nav-link" (click)="onOpenModal('add')">Add Asset <span class="sr-only">(current)</span></a>
+                  </li>
+               </ul>
+               <form class="form-inline my-2 my-lg-0">
+                  <input type="search" (ngModelChange)="searchAsset(key.value)" #key="ngModel" ngModel
+                   name="key" id="searchName" class="form-control mr-sm-2" placeholder="Search Asset..." required>
+               </form>
+            </div>
+          </nav>
+          <div class="container" id="main-container">
+          <div class="row">
+            <div *ngFor="let asset of assets" class="col-md-6 col-xl-3">
+               <div class="card"style="height: 18rem;">  
+                  <div class="card-body">
+                   <div class="float-right btn-group btn-group-sm">
+                      <a (click)="onOpenModalOp(asset, 'delete')" class="btn btn-secondary tooltips" data-placement="top"><i class="fa fa-trash"></i></a>
+                   </div>
+                     <div>
+                      <h5 class="cut-text">{{asset.assetName}}</h5>
+                        <p class="cut-text">{{asset?.assetDescription}}</p>
+                     </div>
+                  </div>
+                  <ul class="list-group list-group-flush">
+                     <li class="list-group-item"><i class="fa fa-envelope float-right"></i>Employee ID : {{asset?.emp}}</li>
+                     <li class="list-group-item"><i class="fa fa-phone float-right"></i>Available : {{asset?.availability}}</li>
+                  </ul>
+          
+                  <div class="card-body">
+                     <div class="float-right btn-group btn-group-sm">
+                      <a class="nav-link" (click)="onOpenModalOp(asset,'History')"><div class="fa fa-history"></div><span class="sr-only">(current)</span></a> 
+                        <button *ngIf="asset.availability" class="button button4" (click)="onOpenModalOp(asset,'edit')">Acquire<span class="sr-only">(current)</span></button>
+                        <button *ngIf="!asset.availability" class="button button4" (click)="updateAssetFalse(asset.id,asset.emp)">Release<span class="sr-only">(current)</span></button>           </div>
+                  </div>
+               </div>
+            </div>
+          </div>
+          
+          <!-- Add Employee Modal -->
+          <div class="modal fade" id="addAssetModal" tabindex="-1" role="dialog" aria-labelledby="addAssetModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                 <div class="modal-header">
+                    <h5 class="modal-title" id="addAssetModalLabel">Add Employee</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                    </button>
+                 </div>
+                 <div class="modal-body">
+                    <form #addForm="ngForm" (ngSubmit)="addAssets(addForm)">
+                    <div class="form-group">
+                       <label for="assetName">Asset Name</label>
+                       <input type="text" ngModel name="assetName" class="form-control" id="assetName" placeholder="Asset Name" required>
+                    </div>
+                    <div class="form-group">
+                       <label for="assetDescription">Description</label>
+                       <input type="text" ngModel name="assetDescription" class="form-control" id="assetDescription" placeholder="Description" required>
+                    </div>
+                    <div class="form-group">
+                       <label for="emp">Employee ID</label>
+                       <input type="text" ngModel name="emp" class="form-control" id="emp" placeholder="Employee Id" required>
+                    </div>
+                    <div class="modal-footer">
+                       <button type="button" id="add-employee-form" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                       <button [disabled]="addForm.invalid" type="submit" class="btn btn-primary" >Save changes</button>
+                    </div>
+                    </form>
+                 </div>
+              </div>
+            </div>
+            </div>
+          
+          <!-- Edit Modal -->
+          <div class="modal fade" id="updateAssetModal" tabindex="-1" role="dialog" aria-labelledby="employeeAssetModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+               <div class="modal-content">
+                  <div class="modal-header">
+                     <h5 class="modal-title" id="updateEmployeeModalLabel">Add Employee Id to acquire</h5>
+                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                     <span aria-hidden="true">&times;</span>
+                     </button>
+                  </div>
+                  <div class="modal-body">
+                     <form #editForm="ngForm">
+                        <div class="form-group">
+                           <label for="name">Enter your employee ID </label>
+                           <input type="text" ngModel="{{editAssets?.emp}}" name="emp" class="form-control" id="empID" aria-describedby="EmployeeID" placeholder="Employee ID">
+                        </div>
+                        <div class="modal-footer">
+                           <button type="button" id="" data-dismiss="modal" class="btn btn-secondary">Close</button>
+                           <button (click)="updateAssetTrue(editForm,editAssets?.id)" data-dismiss="modal" class="btn btn-primary" >Save changes</button>
+                        </div>
+                     </form>
+                  </div>
+               </div>
+            </div>
+          </div>
+          
+          <!-- History Model -->
+          <div class="modal fade" id="HistoryAssetModal" tabindex="-1" role="dialog" aria-labelledby="HistoryAssetModalLabel" aria-hidden="true">
+             <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                   <div class="modal-header">
+                      <h5 class="modal-title" id="updateEmployeeModalLabel">History</h5>
+                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                      </button>
+                   </div>
+                   <div class="modal-body">
+                      <h5>{{empId}}</h5>
+                   </div>
+                   <div class="modal-footer">
+                      <button (click)="clearID()" type="button" id="" data-dismiss="modal" class="btn btn-secondary">Close</button>
+                   </div>
+                </div>
+             </div>
+           </div>
+           
+          <!-- Delete Modal -->
+          <div class="modal fade" id="deleteAssetModal" tabindex="-1" role="dialog" aria-labelledby="deleteModelLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+               <div class="modal-content">
+                  <div class="modal-header">
+                     <h5 class="modal-title" id="deleteModelLabel">Delete Asset</h5>
+                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                     <span aria-hidden="true">&times;</span>
+                     </button>
+                  </div>
+                  <div class="modal-body">
+                     <p>Are you sure you want to delete {{deleteAssets?.assetName}}?</p>
+                     <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+                        <button (click)="deleteAsset(deleteAssets?.id)" class="btn btn-danger" data-dismiss="modal">Yes</button>
+                     </div>
+                  </div>
+               </div>
+            </div>
+          </div>
+          </div>
+          
+      </body>
+</html>
+
